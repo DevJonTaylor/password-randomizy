@@ -91,9 +91,12 @@ class PasswordGenerator {
   }
 }
 
-// Write password to the #password input
+/**
+ * Event Listener for the click event.
+ * @returns {*}
+ */
 function writePassword() {
-  const length = prompt('How long would you like the password to be?  (8-128)');
+  const length = parseInt(prompt('How long would you like the password to be?  (8-128)'));
 
   if(length < 8 || length > 128) {
     alert(`The password length must be between 8 and 128 characters.  ${length} is not valid`);
