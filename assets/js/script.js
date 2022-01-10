@@ -10,14 +10,6 @@
 // Get references to the #generate element
 const generateBtn = document.querySelector('#generate');
 const passwordText = document.querySelector('#password');
-const special =
-const numbers = '0123456789';
-const patterns = {
-  isLower: /[a-z]/,
-  isUpper: /[A-Z]/,
-  isSpecial: new RegExp(`[${special}]`),
-  isNumeric: /[0-9]/
-}
 
 class PasswordGenerator {
   constructor(isLower, isUpper, isSpecial, isNumeric, length) {
