@@ -1,6 +1,6 @@
 
-# Password Generator
-![](https://img.shields.io/static/v1?label=HTML&message=15.2%&color=red) ![](https://img.shields.io/static/v1?label=JavaScript&message=52.1%&color=yellow) ![](https://img.shields.io/static/v1?label=CSS&message=32.7%&color=purple)
+# Password Generator 
+![](https://img.shields.io/static/v1?label=JavaScript&message=52.1%&color=yellow) ![](https://img.shields.io/static/v1?label=CSS&message=32.7%&color=purple) ![](https://img.shields.io/static/v1?label=HTML&message=15.2%&color=red)
 
 A simple request to generate passwords that will allow the user
 to decide if they want lowercase, uppercase, numeric, and special
