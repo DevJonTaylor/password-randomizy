@@ -1,24 +1,36 @@
 {
   "length prompt": [
     {
-      "description": "If the user selects cancel regardless of the number input the return value is null.  This will be converted to NaN and will throw an Error.",
+      "description": "Testing actions should cause the event to cancel.",
       "input": [["0", "pushed Cancel"],["", "pushed Cancel"], ["20", "pushed Cancel"]],
-      "expected": "Stops the event.",
-      "results": "Stops the event."
+      "expected": [true, true, true],
+      "results": [true, true, true]
     },
     {
-      "description": "If the user provides a number less then 8 or more then 128 it is outside the requirements.",
-      "input": [0,4,5,129,20000],
-      "expected": "Stops the user and alerts them then repeats the prompt.",
-      "results": "Stops the user and alerts them then repeats the prompt."
+      "description": "Testing input should not continue.",
+      "input": [0,4,7,129,20000],
+      "expected": [true, true, true, true, true],
+      "results": [true, true, true, true, true]
     },
     {
+      "description": "Testing input should continue",
       "input": [8, 20, 32, 128],
-      "expected": "Accepts the user input and moves to the next parts.",
-      "results": "Accepts the user input and moves to the next parts."
+      "expected": [true, true, true, true],
+      "results": [true, true, true, true]
     }
   ],
   "characters confirm": [
-
-  ]
+    {
+      "description": "Only selecting one type character type should only include that type.",
+      "input": ["lowercase", "uppercase", "special", "numeric"],
+      "expected": [true, true, true, true],
+      "results": [true, true, true, true]
+    }
+  ],
+  "8 length": {
+    "description": "Wrote a function _test_8_length",
+    "iterate": 1000,
+    "times did not have selected character types included": 0,
+    "times it did include selected character types included": 0
+  }
 }
