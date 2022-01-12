@@ -92,22 +92,71 @@ class PasswordGenerator {
 }
 
 /**
+ * Prompts the user if they want to include argument as a character type.  Then returns a boolean as the user's choice.
+ * @param {string} characterType This is the character type in question
+ * @returns {boolean}
+ */
+function characterConfirm(characterType) {
+  return window.confirm(`Would your like to include ${characterType} characters?`);
+}
+
+/**
+ * This function captures the user's input.
+ * If the user does not select an input we will run recursively.
+ * @returns {{isSpecial: boolean, isUpper: boolean, isNumeric: boolean, isLower: boolean}}
+ */
+function selectCharacterType() {
+  /**
+   * This object allows us to better manage the user's character selections.
+   * @type {{isSpecial: boolean, isUpper: boolean, isNumeric: boolean, isLower: boolean, noneSelected(): *}}
+   */
+  const returnMe = {
+    isLower: characterConfirm('lowercase'),
+    isUpper: characterConfirm('uppercase'),
+    isSpecial: characterConfirm('special'),
+    isNumeric: characterConfirm('numerical'),
+
+    /**
+     * If the user does not select a character type then this method returns true.
+     * Else it will return false.
+     * @returns {boolean}
+     */
+    noneSelected() {
+      return !this.isLower && !this.isUpper && !this.isSpecial && !this.isNumeric
+    }
+  }
+
+  // If noneSelected returns true then we will call selectCharacterType recursively.
+  if(returnMe.noneSelected()) {
+    alert('You must select at least one character type.  Select Lowercase, Uppercase, Numeric, or Special Characters.');
+    return selectCharacterType();
+  }
+
+  // Returning only the boolean's to keep the remaining of the code intact.
+  return { isLower, isUpper, isSpecial, isNumeric } = returnMe;
+}
+
+/**
  * Event Listener for the click event.
  * @returns {*}
  */
 function writePassword() {
+  // Captured the user's input as an integer.
   const length = parseInt(prompt('How long would you like the password to be?  (8-128)'));
 
+  // If length is falsy and does not equal 0 then they pushed cancel.
+  if(!length && length !== 0) return;
+
+  // If the length is not less than 8 or greater than 128 then we call writePassword recursively.
   if(length < 8 || length > 128) {
     alert(`The password length must be between 8 and 128 characters.  ${length} is not valid`);
     return writePassword();
   }
 
-  const isLower = confirm('Would you like to include lowercase characters?');
-  const isUpper = confirm('Would you like to include uppercase characters?');
-  const isSpecial = confirm('Would you like to include special characters?');
-  const isNumeric = confirm('Would you like to include numerical characters?');
+  // User's character selections.  These are all boolean.
+  const { isLower, isUpper, isSpecial, isNumeric } = selectCharacterType();
 
+  // Creating the password generator.
   const passGen = new PasswordGenerator(isLower, isUpper, isSpecial, isNumeric, length);
 
   passwordText.value = passGen.password;
