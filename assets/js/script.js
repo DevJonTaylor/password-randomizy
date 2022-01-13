@@ -31,63 +31,63 @@ class PasswordGenerator {
    * @param {number} length How long the password will be.
    */
   constructor(isLower, isUpper, isSpecial, isNumeric, length) {
-    this.isLower = isLower;
-    this.isUpper = isUpper;
-    this.isSpecial = isSpecial;
-    this.isNumeric = isNumeric;
     this.length = length;
-    this.characters = '';
+    this.characters = new Characters(isLower, isUpper, isSpecial, isNumeric);
     this.password = '';
 
-    this.getCharacters();
     this.newPassword();
-  }
-
-  /**
-   * A method to get all characters that are needed.
-   */
-  getCharacters() {
-    this.characters = '';
-    this.characters += this.isLower ? this.getLetters() : '';
-    this.characters += this.isUpper ? this.getLetters(true) : '';
-    this.characters += this.isSpecial ? this.getSpecial() : '';
-    this.characters += this.isNumeric ? this.getNumeric() : '';
   }
 
   /**
    * Takes all given arguments and creates a new password.
    */
   newPassword() {
-    this.password = '';
+    let password = '';
 
     for(let i = 0; i < this.length; i++)
-      this.password += this.characters[randomNumber(0, this.characters.length - 1)];
+      password += this.characters.char;
+
+    this.password = password
+        .split('')
+        .sort(() => (Math.random() > .5) ? 1 : -1)
+        .join('');
+  }
+}
+
+class Characters {
+  #states = [];
+  #currentState = 0;
+  #maxState = 0;
+
+  constructor(isLower, isUpper, isSpecial, isNumeric) {
+    if(isLower) this.#states.push('abcdefghijklmnopqrstuvwxyz');
+    if(isUpper) this.#states.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    if(isSpecial) this.#states.push(' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~');
+    if(isNumeric) this.#states.push('0123456789');
+
+    this.#maxState = this.#states.length - 1;
+    // TODO:  Iterate through state.
+    // TODO:  Remove states that are not requested.
   }
 
-  /**
-   * Returns a-z|A-Z characters.
-   * @param {boolean} isUpper The characters returned will be uppercase.  This is false by default.
-   * @returns {string|string}
-   */
-  getLetters(isUpper = false) {
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
-    return isUpper ? letters.toUpperCase() : letters;
+  get #charList() {
+    return this.#states[this.#currentState];
   }
 
-  /**
-   * Returns a string of special characters.
-   * @returns {string}
-   */
-  getSpecial() {
-    return ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+  get #randomIndex() {
+    return randomNumber(0, this.#charList.length - 1);
   }
 
-  /**
-   * Returns a string of numeric characters.
-   * @returns {string}
-   */
-  getNumeric() {
-    return '01234567890';
+  #tickState() {
+    if(this.#currentState === this.#maxState) this.#currentState = 0;
+    else this.#currentState++;
+  }
+
+  get char() {
+    let char = this.#charList[this.#randomIndex];
+    this.#tickState();
+
+    return char;
   }
 }
 
