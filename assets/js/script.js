@@ -36,7 +36,7 @@ class PasswordGenerator {
     this.isSpecial = isSpecial;
     this.isNumeric = isNumeric;
     this.length = length;
-    this.characters = '';
+    this.characters = [];
     this.password = '';
 
     this.getCharacters();
@@ -47,47 +47,77 @@ class PasswordGenerator {
    * A method to get all characters that are needed.
    */
   getCharacters() {
-    this.characters = '';
-    this.characters += this.isLower ? this.getLetters() : '';
-    this.characters += this.isUpper ? this.getLetters(true) : '';
-    this.characters += this.isSpecial ? this.getSpecial() : '';
-    this.characters += this.isNumeric ? this.getNumeric() : '';
+    this.characters = [];
+    if(this.isLower) this.characters.push(this.getLetters());
+    if(this.isUpper) this.characters.push(this.getLetters(true));
+    if(this.isSpecial) this.characters.push(this.getSpecial());
+    if(this.isNumeric) this.characters.push(this.getNumeric());
   }
 
   /**
    * Takes all given arguments and creates a new password.
    */
   newPassword() {
-    this.password = '';
+    let password = '';
 
     for(let i = 0; i < this.length; i++)
-      this.password += this.characters[randomNumber(0, this.characters.length - 1)];
+      password += this.characters[randomNumber(0, this.characters.length - 1)]();
+
+    this.password = checkMissingCharacters(password);
+  }
+
+  #regFilter(character) {
+    if(/[\/\])/]/.test(character)) return `/${character}`
+  }
+
+  #getRandCharMethod(str) {
+    return () => str[randomNumber(0, str.length - 1)];
   }
 
   /**
-   * Returns a-z|A-Z characters.
-   * @param {boolean} isUpper The characters returned will be uppercase.  This is false by default.
-   * @returns {string|string}
+   * Returns a method that returns a random a-z|A-Z character.
+   * @param {boolean} isUpper The characters returned will be uppercase when true.  This is false by default.
+   * @returns {function|function}
    */
   getLetters(isUpper = false) {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
-    return isUpper ? letters.toUpperCase() : letters;
+    return this.#getRandCharMethod(isUpper ? letters.toUpperCase() : letters);
   }
 
   /**
-   * Returns a string of special characters.
-   * @returns {string}
+   * Returns a method that returns a random special character.
+   * @returns {function}
    */
   getSpecial() {
-    return ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+    return this.#getRandCharMethod(' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~');
   }
 
   /**
-   * Returns a string of numeric characters.
-   * @returns {string}
+   * Returns a method that returns a random numeric character.
+   * @returns {function}
    */
   getNumeric() {
-    return '01234567890';
+    return this.#getRandCharMethod('01234567890');
+  }
+
+  #testStrRegEx(str, regExString) {
+    return new RegExp(regExString).test(str)
+  }
+
+  #hasLowerType(str) {
+    return this.#testStrRegEx(str, '[a-z]');
+  }
+
+  #hasUpperType(str) {
+    return this.#testStrRegEx(str, '[A-Z]');
+  }
+
+  #hasNumericType(str) {
+    return this.#testStrRegEx(str, '[0-9]');
+  }
+
+  #hasSpecialType(str) {
+    return this.#testStrRegEx(str, `[ !"#$%&'()*+,-./:;<=>?@\[\\\]^_\`{|}~]`);
   }
 }
 
@@ -164,3 +194,58 @@ function writePassword() {
 
 // Add event listener to generate button
 generateBtn.addEventListener("click", writePassword);
+
+function _test_8_length(iterates = 1000, options = {
+  isLower: true,
+  isUpper: true,
+  isSpecial: true,
+  isNumeric: true,
+  length: 8
+} ) {
+  let missingNumeric = 0;
+  let missingSpecial = 0;
+  let missingLower = 0;
+  let missingUpper = 0;
+  let missingMoreThanOne = 0;
+
+  function test(str, isLower = true, isUpper = true, isSpecial = true, isNumeric = true) {
+    const special = /[ !"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/;
+    const lower = /[a-z]/;
+    const upper = /[A-Z]/;
+    const numeric = /[0-9]/;
+    let missingCharacterType = 0;
+
+    if(isLower && !lower.test(str)) {
+      missingLower++;
+      missingCharacterType++;
+    }
+    if(isUpper && !upper.test(str)) {
+      missingUpper++;
+      missingCharacterType++;
+    }
+    if(isSpecial && !special.test(str)) {
+      missingSpecial++;
+      missingCharacterType++;
+    }
+    if(isNumeric && !numeric.test(str)) {
+      missingNumeric++;
+      missingCharacterType++;
+    }
+
+    if(missingCharacterType > 1) missingMoreThanOne++;
+  }
+
+  const pass = new PasswordGenerator(
+      options.isLower,
+      options.isUpper,
+      options.isSpecial,
+      options.isNumeric,
+      options.length
+  );
+
+  for(let i = 0; i < iterates; i++) {
+    pass.newPassword();
+    test(pass.password);
+  }
+  debugger;
+}
